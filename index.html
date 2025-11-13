@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>قائمة المنتجات</title>
+  <style>
+    body {
+      font-family: "Tajawal", sans-serif;
+      background-color: #f8fafc;
+      color: #222;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d6efd;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .name {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .sku {
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      margin: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0b5ed7;
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+    <h1>📂 الأقسام</h1>
+    <ul id="categories" class="categories"></ul>
+  </div>
+
+  <script>
+    const apiBase = "https://api.45botique.com/api/categories"; // رابط API الأقسام
+    let currentPage = 1;
+
+    async function fetchCategories(page = 1) {
+      try {
+        const res = await fetch(`${apiBase}?page=${page}`);
+        const data = await res.json();
+        displayCategories(data.data);
+      } catch (err) {
+        console.error("API Error:", err);
+        document.getElementById("categories").innerHTML = "<li>خطأ في تحميل الأقسام</li>";
+      }
+    }
+
+    function displayCategories(categories) {
+      const container = document.getElementById("categories");
+      container.innerHTML = "";
+
+      categories.forEach(cat => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="cat.html?slug=${encodeURIComponent(cat.slug)}">${cat.name}</a>`;
+
+        if (cat.children && cat.children.length > 0) {
+          const ulChildren = document.createElement("ul");
+          cat.children.forEach(child => {
+            const childLi = document.createElement("li");
+            childLi.innerHTML = `<a href="cat.html?slug=${encodeURIComponent(child.slug)}">${child.name}</a>`;
+            ulChildren.appendChild(childLi);
+          });
+          li.appendChild(ulChildren);
+        }
+
+        container.appendChild(li);
+      });
+    }
+
+    // تحميل الأقسام عند فتح الصفحة
+    fetchCategories();
+  </script>
+
+  <div class="container">
+    <h1>📦 قائمة المنتجات</h1>
+    <div id="products" class="products"></div>
+
+    <div class="pagination">
+      <button class="btn" id="prev">⬅ الصفحة السابقة</button>
+      <button class="btn" id="next">الصفحة التالية ➡</button>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "https://api.45botique.com/api/products";
+    let currentPage = 1;
+
+    async function fetchProducts(page = 1) {
+      const response = await fetch(`${apiBase}?page=${page}`);
+      const data = await response.json();
+      displayProducts(data.data);
+
+      document.getElementById("prev").disabled = !data.prev_page_url;
+      document.getElementById("next").disabled = !data.next_page_url;
+    }
+
+    function displayProducts(products) {
+      const container = document.getElementById("products");
+      container.innerHTML = "";
+
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const imgSrc = product.image && product.image.trim() !== ""
+          ? product.image
+          : "https://via.placeholder.com/300x180?text=No+Image";
+
+        card.innerHTML = `
+          <img src="${imgSrc}" alt="${product.name}">
+          <div class="card-content">
+           <div class="name">
+  <a href="product.html?slug=${encodeURIComponent(product.slug)}">${product.name}</a>
+</div>
+
+            <div class="sku">رقم الصنف: ${product.sku}</div>
+            <div class="sku">الباركود: ${product.barcode}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById("prev").addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchProducts(currentPage);
+      }
+    });
+
+    document.getElementById("next").addEventListener("click", () => {
+      currentPage++;
+      fetchProducts(currentPage);
+    });
+
+    // تحميل أول صفحة عند الفتح
+    fetchProducts();
+  </script>
+</body>
+</html>
+
