@@ -94,19 +94,20 @@
   </div>
 
   <script>
-    const apiBase = "https://api.45botique.com/api/categories"; // رابط API الأقسام
-    let currentPage = 1;
+  const apiCategories = "https://api.45botique.com/api/categories"; // رابط API الأقسام
+let currentCategoryPage = 1;
 
-    async function fetchCategories(page = 1) {
-      try {
-        const res = await fetch(`${apiBase}?page=${page}`);
-        const data = await res.json();
-        displayCategories(data.data);
-      } catch (err) {
-        console.error("API Error:", err);
-        document.getElementById("categories").innerHTML = "<li>خطأ في تحميل الأقسام</li>";
-      }
-    }
+async function fetchCategories(page = 1) {
+  try {
+    const res = await fetch(`${apiCategories}?page=${page}`);
+    const data = await res.json();
+    displayCategories(data.data);
+  } catch (err) {
+    console.error("API Error:", err);
+    document.getElementById("categories").innerHTML = "<li>خطأ في تحميل الأقسام</li>";
+  }
+}
+
 
     function displayCategories(categories) {
       const container = document.getElementById("categories");
@@ -201,4 +202,5 @@
   </script>
 </body>
 </html>
+
 
