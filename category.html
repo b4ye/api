@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الأقسام</title>
+
+  <style>
+    body {
+      font-family: "Tajawal", sans-serif;
+      background-color: #f8fafc;
+      color: #222;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+
+    /* Loader */
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #ddd;
+      border-top-color: #0d6efd;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 80px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* container */
+    .container {
+      max-width: 950px;
+      margin: auto;
+      display: none; /* مخفي لحين التحميل */
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d6efd;
+      margin-bottom: 25px;
+    }
+
+    ul.categories {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    ul.categories li {
+      background: #fff;
+      margin-bottom: 12px;
+      padding: 12px 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: transform .2s, opacity .3s;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeIn .4s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    ul.categories li a {
+      text-decoration: none;
+      color: #0d6efd;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    /* children */
+    .child {
+      background: #eef2f7;
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div id="loader" class="loader"></div>
+
+  <div class="container">
+    <h1>📂 الأقسام</h1>
+    <ul id="categories" class="categories"></ul>
+  </div>
+
+<script>
+  const API_URL = "https://api.45botique.com/api/categories";
+  const API_KEY = "erh124e33r4sd9abcdef";
+
+  fetchCategories();
+
+  async function fetchCategories() {
+    try {
+      const res = await fetch(API_URL, {
+        headers: { "X-API-KEY": API_KEY }
+      });
+
+      const json = await res.json();
+
+      if (!json.data) {
+        showError("تعذر تحميل الأقسام");
+        return;
+      }
+
+      renderCategories(json.data);
+
+      // hide loader + show container
+      document.getElementById("loader").style.display = "none";
+      document.querySelector(".container").style.display = "block";
+
+    } catch (err) {
+      showError("⚠ خطأ في الاتصال بالـ API");
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById("loader").style.display = "none";
+    document.querySelector(".container").innerHTML =
+      `<p style="padding:20px;color:red;text-align:center;">${msg}</p>`;
+  }
+
+  /* Recursive tree rendering (4 levels) */
+  function renderCategories(categories) {
+    const container = document.getElementById("categories");
+
+    categories.forEach(cat => {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        <a href="cat.html?slug=${encodeURIComponent(cat.slug)}">
+          ${cat.title}
+        </a>
+      `;
+
+      // render children recursively
+      appendChildren(li, cat.children, 1);
+
+      container.appendChild(li);
+    });
+  }
+
+  function appendChildren(parentElement, children, level) {
+    if (!children || children.length === 0 || level > 4) return;
+
+    children.forEach(child => {
+      const div = document.createElement("div");
+      div.classList.add("child");
+      div.style.marginRight = (level * 12) + "px"; // توسيع المسافة حسب المستوى
+
+      div.innerHTML = `
+        <a href="cat.html?slug=${encodeURIComponent(child.slug)}">
+          ${child.title}
+        </a>
+      `;
+
+      parentElement.appendChild(div);
+
+      // recursive render
+      appendChildren(div, child.children, level + 1);
+    });
+  }
+</script>
+
+</body>
+</html>

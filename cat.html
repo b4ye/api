@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منتجات القسم</title>
+
+  <style>
+    body {
+      font-family: "Tajawal", sans-serif;
+      background-color: #f8fafc;
+      color: #222;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d6efd;
+      margin-bottom: 20px;
+    }
+
+    /* Loader */
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #ddd;
+      border-top-color: #0d6efd;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 80px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      display: none;
+    }
+
+    /* Grid */
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 30px;
+    }
+
+    /* Card */
+    .card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding-bottom: 10px;
+      transition: transform .2s, opacity .3s;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeIn .4s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .card-content {
+      padding: 12px;
+    }
+
+    .name {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #0d6efd;
+      margin-bottom: 6px;
+    }
+
+    .sku {
+      color: #555;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .link-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #0d6efd;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: .2s;
+    }
+
+    .link-btn:hover {
+      background: #084dbf;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div id="loader" class="loader"></div>
+
+  <div class="container">
+    <h1 id="categoryName">📦 منتجات القسم</h1>
+    <div id="products" class="products"></div>
+  </div>
+
+<script>
+  const API_BASE = "https://api.45botique.com/api/categories";
+  const API_KEY = "erh124e33r4sd9abcdef";
+
+  const slug = new URLSearchParams(window.location.search).get("slug");
+
+  document.getElementById("categoryName").textContent = `📦 منتجات القسم: ${slug}`;
+
+  fetchCategoryProducts(slug);
+
+  async function fetchCategoryProducts(slug) {
+    try {
+      const res = await fetch(`${API_BASE}/${slug}/products`, {
+        headers: { "X-API-KEY": API_KEY }
+      });
+
+      const json = await res.json();
+
+      if (!json.data) {
+        showError("تعذر تحميل المنتجات");
+        return;
+      }
+
+      displayProducts(json.data);
+
+      document.getElementById("loader").style.display = "none";
+      document.querySelector(".container").style.display = "block";
+
+    } catch (err) {
+      showError("خطأ في الاتصال بالـAPI");
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById("loader").style.display = "none";
+    document.querySelector(".container").innerHTML =
+      `<p style="padding:20px;color:red;text-align:center;">${msg}</p>`;
+  }
+
+  function displayProducts(products) {
+    const container = document.getElementById("products");
+    container.innerHTML = "";
+
+    products.forEach(product => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+
+      const imgSrc = product.image ? product.image : "images/no-image.png";
+
+      card.innerHTML = `
+        <img src="${imgSrc}" loading="lazy" alt="${product.name}">
+        <div class="card-content">
+          <div class="name">${product.name}</div>
+          <div class="sku">رقم الصنف: ${product.sku}</div>
+          <div class="sku">الباركود: ${product.barcode || "غير متوفر"}</div>
+
+          <a class="link-btn" href="product.html?slug=${product.slug}">
+            عرض المنتج ➜
+          </a>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+</script>
+
+</body>
+</html>
