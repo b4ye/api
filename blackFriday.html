@@ -26,32 +26,13 @@
             margin-top: 10px;
         }
 
-        .new-price {
-            color: #d60000;
-            font-weight: bold;
-            font-size: 18px;
-            margin-right: 8px;
-        }
 
-        .old-price {
-            text-decoration: line-through;
-            color: #777;
-            margin-right: 8px;
-        }
-
-        .discount {
-            background: #ffecec;
-            padding: 4px 6px;
-            border-radius: 6px;
-            color: #b30000;
-            font-weight: bold;
-        }
 
         .timer {
             margin-top: 10px;
             font-size: 22px;
             font-weight: bold;
-            color: #ffcc00;
+
         }
 
         .container {
@@ -73,13 +54,13 @@
             flex-direction: column;
         }
 
-        .card img {
+        card img {
             width: 100%;
-            height: 160px;
-            object-fit: contain;
             border-radius: 8px;
             background: #fff;
+            object-fit: cover;
         }
+
 
         .name {
             margin-top: 10px;
@@ -142,19 +123,55 @@
         .filter-btn:hover {
             background: #e6f0ff;
         }
+
+        .whatsapp-btn {
+            margin-top: 10px;
+            background: #25D366;
+            color: #fff;
+            display: block;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .whatsapp-btn:hover {
+            background: #1ebe5d;
+        }
+
+        .new-price {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .old-price {
+            color: #777;
+            text-decoration: line-through;
+            margin-bottom: 4px;
+        }
+
+        .discount {
+            background: #ffecec;
+            padding: 4px 8px;
+            display: inline-block;
+            border-radius: 5px;
+            color: #b30000;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
 
     <header>
-        <div style="display:flex;justify-content:center;align-items:center">
-
-            <h1 style="margin:0 10px">عرض Black Friday — آخر حبة في الصندوق</h1>
-
+        <div style="display:flex;justify-content:center;align-items:center;text-align:center">
+            <h1 style="margin:0 10px;color:#ffb100;">عرض <span> Black Friday</span>
+            </h1>
+            <br>
         </div>
-
-        <!-- <div class="timer" id="countdown">00:00:00</div> -->
+        <h3> آخر قطعـــــة في الصندوق</h3>
 
         <div style="margin-top:15px;">
             <button onclick="setFilter('all')" class="filter-btn">الكل</button>
@@ -172,9 +189,9 @@
     <script>
 
         const API_URL = "https://api.45botique.com/api/blackFriday";
-        const PAGE_SIZE = 20;
         const API_KEY = "erh124e33r4sd9abcdef";
 
+        const PAGE_SIZE = 20;
 
         let allProducts = [];
         let currentPage = 1;
@@ -230,15 +247,23 @@
       <h3>${p.name}</h3>
       <p>الكود: ${p.sku}</p>
 
-      <div class="price-box">
-          <span class="new-price">${p.unit_price } ريال</span>
-          <span class="old-price">${p.price} ريال</span>
-          <span class="discount">${p.discount} خصم</span>
+         <div class="price-box">
+          <div class="new-price">السعر بعد الخصم: <span style="color:red;"> ${p.unit_price} ريال</span></div>
+          <div class="old-price">السعر السابق: ${p.price} ريال</div>
+          <div class="discount">الخصم: ${p.discount}</div>
       </div>
+   <div class="badge ${p.status === 'sold' ? 'sold' : 'available'}">
+          ${p.status === 'sold' ? 'تم البيع' : 'آخر قطعــــة'}
+      </div>
+      <a 
+        href="https://wa.me/967770045145?text=مرحبا،%20أريد%20شراء%20المنتج:%0Aالاسم:%20${encodeURIComponent(p.name)}%0Aالكود:%20${encodeURIComponent(p.sku)}" 
+        target="_blank"
+        class="whatsapp-btn"
+      >
+        شراء عبر واتس آب
+      </a>
 
-      <div class="badge ${p.status === 'sold' ? 'sold' : 'available'}">
-          ${p.status === 'sold' ? 'تم البيع' : 'آخر قطعة'}
-      </div>
+   
   </div>
 `;
 
@@ -260,6 +285,5 @@
         loadProducts();
     </script>
 </body>
-
 
 </html>
