@@ -173,12 +173,21 @@
 
         const API_URL = "https://api.45botique.com/api/blackFriday";
         const PAGE_SIZE = 20;
+        const API_KEY = "erh124e33r4sd9abcdef";
+
 
         let allProducts = [];
         let currentPage = 1;
 
         async function loadProducts() {
-            const res = await fetch(API_URL);
+            const res = await fetch(API_URL, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                }
+            });
+
             const json = await res.json();
             allProducts = json.data;
             renderPage(1);
@@ -251,5 +260,6 @@
         loadProducts();
     </script>
 </body>
+
 
 </html>
