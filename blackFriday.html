@@ -177,6 +177,9 @@
             <button onclick="setFilter('all')" class="filter-btn">الكل</button>
             <button onclick="setFilter('available')" class="filter-btn">المتوفر</button>
             <button onclick="setFilter('sold')" class="filter-btn">تم البيع</button>
+
+            <button onclick="setFiltertype('b')" class="filter-btn">شنط </button>
+            <button onclick="setFiltertype('w')" class="filter-btn">ساعات </button>
         </div>
 
     </header>
@@ -210,20 +213,29 @@
             renderPage(1);
         }
 
-        function renderPage(page) {
-            currentPage = page;
-            let filteredData = allProducts;
-            if (filterStatus === "available") {
-                filteredData = allProducts.filter(p => p.status === "available");
-            } else if (filterStatus === "sold") {
-                filteredData = allProducts.filter(p => p.status === "sold");
-            }
-            const start = (page - 1) * PAGE_SIZE;
-            const items = filteredData.slice(start, start + PAGE_SIZE);
+       
+function renderPage(page) {
+    currentPage = page;
+    let filteredData = allProducts;
 
-            renderProducts(items);
-            renderPagination(filteredData.length);
-        }
+    // فلترة حسب الحالة
+    if (filterStatus === "available") {
+        filteredData = filteredData.filter(p => p.status === "available");
+    } else if (filterStatus === "sold") {
+        filteredData = filteredData.filter(p => p.status === "sold");
+    }
+
+    // فلترة حسب النوع
+    if (filterType !== "all") {
+        filteredData = filteredData.filter(p => p.type === filterType);
+    }
+
+    const start = (page - 1) * PAGE_SIZE;
+    const items = filteredData.slice(start, start + PAGE_SIZE);
+
+    renderProducts(items);
+    renderPagination(filteredData.length);
+}
 
 
         let filterStatus = "all";
@@ -231,7 +243,11 @@
             filterStatus = type;
             renderPage(1);
         }
-
+let filterType = "all";
+function setFiltertype(type) {
+    filterType = type;
+    renderPage(1);
+}
         function renderProducts(items) {
             const container = document.getElementById("products");
             container.innerHTML = "";
@@ -287,4 +303,5 @@
 </body>
 
 </html>
+
 
