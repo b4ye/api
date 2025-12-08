@@ -138,12 +138,16 @@ async function fetchCategoryProducts(url) {
 
     const json = await res.json();
 
-    if (!json.data || !json.data.data) {
+   
+    const products = json.data;
+
+    if (!products || products.length === 0) {
       showError("لا توجد منتجات");
       return;
     }
 
-    displayProducts(json.data.data);
+    displayProducts(products);
+
 
     nextPageUrl = json.next_page_url;
     prevPageUrl = json.prev_page_url;
@@ -157,6 +161,7 @@ async function fetchCategoryProducts(url) {
     showError("خطأ في الاتصال بالـ API");
   }
 }
+
 
 function displayProducts(products) {
   const container = document.getElementById("products");
@@ -211,4 +216,5 @@ function showError(msg) {
 
 </body>
 </html>
+
 
