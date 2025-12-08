@@ -119,72 +119,96 @@
   </div>
 
 <script>
-  const API_BASE = "https://api.45botique.com/api/categories";
-  const API_KEY = "erh124e33r4sd9abcdef";
+const API_BASE = "https://api.45botique.com/api/categories";
+const API_KEY = "erh124e33r4sd9abcdef";
 
-  const slug = new URLSearchParams(window.location.search).get("slug");
+const slug = new URLSearchParams(window.location.search).get("slug");
+let nextPageUrl = null;
+let prevPageUrl = null;
 
-  document.getElementById("categoryName").textContent = `📦 منتجات القسم: ${slug}`;
+document.getElementById("categoryName").textContent = `📦 منتجات القسم: ${slug}`;
 
-  fetchCategoryProducts(slug);
+fetchCategoryProducts(`${API_BASE}/${slug}/products`);
 
-  async function fetchCategoryProducts(slug) {
-    try {
-      const res = await fetch(`${API_BASE}/${slug}/products`, {
-        headers: { "X-API-KEY": API_KEY }
-      });
-
-      const json = await res.json();
-
-      if (!json.data) {
-        showError("تعذر تحميل المنتجات");
-        return;
-      }
-
-      displayProducts(json.data);
-
-      document.getElementById("loader").style.display = "none";
-      document.querySelector(".container").style.display = "block";
-
-    } catch (err) {
-      showError("خطأ في الاتصال بالـAPI");
-    }
-  }
-
-  function showError(msg) {
-    document.getElementById("loader").style.display = "none";
-    document.querySelector(".container").innerHTML =
-      `<p style="padding:20px;color:red;text-align:center;">${msg}</p>`;
-  }
-
-  function displayProducts(products) {
-    const container = document.getElementById("products");
-    container.innerHTML = "";
-
-    products.forEach(product => {
-      const card = document.createElement("div");
-      card.classList.add("card");
-
-      const imgSrc = product.image ? product.image : "images/no-image.png";
-
-      card.innerHTML = `
-        <img src="${imgSrc}" loading="lazy" alt="${product.name}">
-        <div class="card-content">
-          <div class="name">${product.name}</div>
-          <div class="sku">رقم الصنف: ${product.sku}</div>
-          <div class="sku">الباركود: ${product.barcode || "غير متوفر"}</div>
-
-          <a class="link-btn" href="product.html?slug=${product.slug}">
-            عرض المنتج ➜
-          </a>
-        </div>
-      `;
-
-      container.appendChild(card);
+async function fetchCategoryProducts(url) {
+  try {
+    const res = await fetch(url, {
+      headers: { "X-API-KEY": API_KEY }
     });
+
+    const json = await res.json();
+
+    if (!json.data || !json.data.data) {
+      showError("لا توجد منتجات");
+      return;
+    }
+
+    displayProducts(json.data.data);
+
+    nextPageUrl = json.next_page_url;
+    prevPageUrl = json.prev_page_url;
+
+    updatePaginationButtons();
+
+    document.getElementById("loader").style.display = "none";
+    document.querySelector(".container").style.display = "block";
+
+  } catch (err) {
+    showError("خطأ في الاتصال بالـ API");
   }
+}
+
+function displayProducts(products) {
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.classList.add("card");
+
+    const imgSrc = product.image ? product.image : "images/no-image.png";
+
+    card.innerHTML = `
+      <img src="${imgSrc}" loading="lazy" alt="${product.name}">
+      <div class="card-content">
+        <div class="name">${product.name}</div>
+        <div class="sku">رقم الصنف: ${product.sku}</div>
+        <div class="sku">الباركود: ${product.barcode || "غير متوفر"}</div>
+        <a class="link-btn" href="product.html?slug=${product.slug}">
+          عرض المنتج ➜
+        </a>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function updatePaginationButtons() {
+  let area = document.getElementById("pagination");
+
+  if (!area) {
+    area = document.createElement("div");
+    area.id = "pagination";
+    area.style = "text-align:center;margin:20px;";
+    document.querySelector(".container").appendChild(area);
+  }
+
+  area.innerHTML = `
+    ${prevPageUrl ? `<button onclick="fetchCategoryProducts('${prevPageUrl}')">⬅ السابق</button>` : ""}
+    ${nextPageUrl ? `<button onclick="fetchCategoryProducts('${nextPageUrl}')">التالي ➜</button>` : ""}
+  `;
+}
+
+function showError(msg) {
+  document.getElementById("loader").style.display = "none";
+  document.querySelector(".container").innerHTML =
+    `<p style="padding:20px;color:red;text-align:center;">${msg}</p>`;
+}
+
 
 </script>
 
 </body>
 </html>
+
