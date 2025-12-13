@@ -302,6 +302,34 @@
       border-top: 1px solid #e2e8f0;
       margin-top: 40px;
     }
+
+    .sub-categories {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin-bottom: 25px;
+}
+
+.sub-category {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #000;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  white-space: nowrap;
+}
+
+.sub-category img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
   </style>
 </head>
 
@@ -319,6 +347,8 @@
 
   <!-- Main Content -->
   <div class="container" style="display: none;">
+    <div id="subCategories" class="sub-categories"></div>
+
     <div id="products" class="products-grid"></div>
     
     <!-- Pagination -->
@@ -356,9 +386,25 @@
 
     document.getElementById("categoryName").textContent = `منتجات القسم`;
     document.getElementById("breadcrumb").textContent = `الصفحة الرئيسية / ${slug}`;
-
+fetchCategoryInfo(slug);
     fetchCategoryProducts(`${API_BASE}/${slug}/products`);
 
+    async function fetchCategoryInfo(slug) {
+  const res = await fetch(`${API_BASE}/${slug}`, {
+    headers: { "X-API-KEY": API_KEY }
+  });
+
+  const json = await res.json();
+  if (!json.data) return;
+
+  document.getElementById("categoryName").textContent = json.data.name;
+  document.getElementById("breadcrumb").textContent =
+    `الرئيسية / ${json.data.name}`;
+
+  renderSubCategories(json.data.children);
+}
+
+    
     async function fetchCategoryProducts(url) {
       try {
         document.getElementById("loader").style.display = "flex";
@@ -457,6 +503,26 @@
         container.appendChild(card);
       });
     }
+    function renderSubCategories(children) {
+  if (!children || children.length === 0) return;
+
+  const container = document.getElementById("subCategories");
+  container.innerHTML = "";
+
+  children.forEach(cat => {
+    const div = document.createElement("a");
+    div.href = `cat.html?slug=${cat.slug}`;
+    div.className = "sub-category";
+
+    div.innerHTML = `
+      ${cat.image ? `<img src="${cat.image}">` : ""}
+      <span>${cat.name}</span>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
 
     function updatePagination() {
       const prevBtn = document.getElementById("prevBtn");
@@ -532,5 +598,6 @@
   </script>
 </body>
 </html>
+
 
 
