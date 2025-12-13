@@ -81,15 +81,18 @@
 .cat-link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  direction: rtl;
+  gap: 10px;
+  direction: rtl;        /* RTL */
+  text-decoration: none;
+  color: #0d6efd;
 }
 
 .cat-img {
   width: 28px;
   height: 28px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 50%;    /* 🔵 دائرية */
+  flex-shrink: 0;
 }
 
 .child .cat-img {
@@ -98,6 +101,7 @@
 }
 
 .cat-name {
+  font-size: 14px;
   white-space: nowrap;
 }
 
@@ -192,6 +196,7 @@ li.innerHTML = `
  <script src="https://cdn.counter.dev/script.js" data-id="63a59253-ddc0-4cf1-903c-fbaa3e5d4544" data-utcoffset="3"></script>
 </body>
 </html>
+
 
 
 
