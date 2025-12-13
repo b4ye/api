@@ -154,12 +154,13 @@
     categories.forEach(cat => {
       const li = document.createElement("li");
 
-      li.innerHTML = `
-        <a href="cat.html?slug=${encodeURIComponent(cat.slug)}" class="cat-link">
-          <span class="cat-name">${cat.name}</span>
-          ${cat.image ? `<img src="${cat.image}" class="cat-img">` : ""}
-        </a>
-      `;
+li.innerHTML = `
+  <a href="cat.html?slug=${encodeURIComponent(cat.slug)}" class="cat-link">
+    ${cat.image ? `<img src="${cat.image}" class="cat-img">` : ""}
+    <span class="cat-name">${cat.name}</span>
+  </a>
+`;
+
 
       appendChildren(li, cat.children, 1);
       container.appendChild(li);
@@ -174,12 +175,13 @@
       div.classList.add("child");
       div.style.marginRight = (level * 14) + "px";
 
-      div.innerHTML = `
-        <a href="cat.html?slug=${encodeURIComponent(child.slug)}" class="cat-link">
-          <span class="cat-name">${child.name}</span>
-          ${child.image ? `<img src="${child.image}" class="cat-img">` : ""}
-        </a>
-      `;
+  div.innerHTML = `
+  <a href="cat.html?slug=${encodeURIComponent(child.slug)}" class="cat-link">
+    ${child.image ? `<img src="${child.image}" class="cat-img">` : ""}
+    <span class="cat-name">${child.name}</span>
+  </a>
+`;
+
 
       parentElement.appendChild(div);
       appendChildren(div, child.children, level + 1);
@@ -190,6 +192,7 @@
  <script src="https://cdn.counter.dev/script.js" data-id="63a59253-ddc0-4cf1-903c-fbaa3e5d4544" data-utcoffset="3"></script>
 </body>
 </html>
+
 
 
 
