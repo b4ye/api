@@ -385,7 +385,17 @@
     let prevPageUrl = null;
 
     document.getElementById("categoryName").textContent = `منتجات القسم`;
-    document.getElementById("breadcrumb").textContent = `الصفحة الرئيسية / ${slug}`;
+    document.getElementById("breadcrumb").innerHTML = `
+  <a href="javascript:void(0)" onclick="goBack()" style="color:#fff;text-decoration:underline;">
+    الصفحة الرئيسية
+  </a>
+  / ${slug}
+`;
+
+function goBack() {
+  window.history.back();
+}
+
 fetchCategoryInfo(slug);
     fetchCategoryProducts(`${API_BASE}/${slug}/products`);
 
@@ -598,6 +608,7 @@ fetchCategoryInfo(slug);
   </script>
 </body>
 </html>
+
 
 
 
